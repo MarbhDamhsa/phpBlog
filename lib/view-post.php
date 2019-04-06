@@ -63,16 +63,19 @@ function addCommentToPost(PDO $pdo, $postId, array $commentData)
         $sql = "
             INSERT INTO
                 comment
-            (name, website, text, post_id)
-            VALUES(:name, :website, :text, :post_id)
+            (name, website, text, created_at, post_id)
+            VALUES(:name, :website, :text, :created_at, :post_id)
         ";
         $stmt = $pdo->prepare($sql);
         if ($stmt === false)
         {
             throw new Exception('Cannot prepare statement to insert comment');
         }
+
         $result = $stmt->execute(
-            array_merge($commentData, array('post_id' => $postId, ))
+            array_merge($commentData, array('post_id' => $postId, 
+            'created_at' => getSqlDateForNow(), )
+            )
         );
 
         if ($result === false)
