@@ -37,7 +37,7 @@ function getPostRow(PDO $pdo, $postId)
 
 /**
  * Writes a comment to a particular post
- *
+ * 
  * @param PDO $pdo
  * @param integer $postId
  * @param array $commentData
@@ -47,7 +47,7 @@ function addCommentToPost(PDO $pdo, $postId, array $commentData)
 {
     $errors = array();
 
-    //Do some validation
+    // Do some validation
     if (empty($commentData['name']))
     {
         $errors['name'] = 'A name is required';
@@ -57,7 +57,7 @@ function addCommentToPost(PDO $pdo, $postId, array $commentData)
         $errors['text'] = 'A comment is required';
     }
 
-    // If error free, try to write the comment
+    // If we are error free, try writing the comment
     if (!$errors)
     {
         $sql = "
@@ -73,14 +73,15 @@ function addCommentToPost(PDO $pdo, $postId, array $commentData)
         }
 
         $result = $stmt->execute(
-            array_merge($commentData, array('post_id' => $postId, 
-            'created_at' => getSqlDateForNow(), )
+            array_merge(
+                $commentData,
+                array('post_id' => $postId, 'created_at' => getSqlDateForNow(), )
             )
         );
 
         if ($result === false)
         {
-            //@todo This renders a database-level message to the user, fix this
+            // @todo This renders a database-level message to the user, fix this
             $errorInfo = $stmt->errorInfo();
             if ($errorInfo)
             {
@@ -90,4 +91,4 @@ function addCommentToPost(PDO $pdo, $postId, array $commentData)
     }
 
     return $errors;
-}
+} 
