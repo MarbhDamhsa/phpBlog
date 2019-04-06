@@ -45,6 +45,15 @@ if ($_POST)
 	}
 }
 
+else
+{
+	$commentData = array(
+		'name' => '',
+		'website' => '',
+		'text' => '',
+	);
+}
+
 // Swap carriage returns for paragraph breaks
 $bodyText = htmlEscape($row['body']);
 $paraText = str_replace("\n", "</p><p>", $bodyText);
@@ -89,5 +98,7 @@ $paraText = str_replace("\n", "</p><p>", $bodyText);
                 </div>
             </div>
         <?php endforeach ?>
+
+        <?php require 'templates/comment-form.php' ?>
     </body>
 </html>
