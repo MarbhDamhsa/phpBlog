@@ -19,7 +19,7 @@ if ($_POST)
 	$pdo = getPDO();
 
 	// Redirect only if the password is correct
-	@username = $_POST['username'];
+	$username = $_POST['username'];
 	$ok = tryLogin($pdo, $username, $_POST['password']);
 
 	if($ok)
