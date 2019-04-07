@@ -28,24 +28,25 @@ if (!$row)
 $errors = null;
 if ($_POST)
 {
-	$commentData = array(
-		'name' => $_POST['comment-name'],
-		'website' => $_POST['comment-website'],
-		'text' => $_POST['comment-text'],
-	);
+    switch ($_GET['action'])
+    {
+        case 'add-comment':
+	      $commentData = array(
+		      'name' => $_POST['comment-name'],
+		      'website' => $_POST['comment-website'],
+		      'text' => $_POST['comment-text'],
+	       );
 
-	$errors = addCommentToPost(
-		$pdo,
-		$postId,
-		$commentData
-	);
-
-	// If there are no errors, redirect back to self and redisplay
-	if (!$errors)
-	{
-		redirectAndExit('view-post.php?post_id=' . $postId);
-	}
-}
+    	   $errors = handleAddComment($pdo, $postId, $commentData);
+            break;
+        case 'delete-comment';
+            // Don't do anything if the user is not authorized
+            $deleteResponse = $_POST['delete-comment'];
+            handleDeleteComment($pdo, $postId, $deleteResponse);
+            
+            break;
+        }
+    }
 
 else
 {
@@ -80,25 +81,11 @@ else
             <?php echo convertNewLinesToParagraphs($row['body']) ?>
         </div>
 
-        <div class="comment-list">
+        <?php require 'templates/list-comments.php' ?>
 
-            <h3><?php echo countCommentsForPost($pdo, $postId) ?> comments</h3>
+        <?php //We use $commentData in this HTML fragment ?>
 
-            <?php foreach (getCommentsForPost($pdo, $postId) as $comment): ?>
-                <div class="comment">
-                    <div class="comment-meta">
-                        Comment from
-                        <?php echo htmlEscape($comment['name']) ?>
-                        on
-                        <?php echo convertSqlDate($comment['created_at']) ?>
-                    </div>
-                    <div class="comment-body">
-                        <?php // This is already escaped ?>
-                        <?php echo convertNewLinesToParagraphs($comment['text']) ?>
-                    </div>
-                </div>
-            <?php endforeach ?>
-        </div>
+
         <?php require 'templates/comment-form.php' ?>
     </body>
 </html>
