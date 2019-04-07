@@ -1,14 +1,15 @@
  <?php
+
 /**
- * Called to handle the comment form, redirects upon succes
- *
+ * Called to handle the comment form, redirects upon success
+ * 
  * @param PDO $pdo
  * @param integer $postId
- * @param array $commentdata
+ * @param array $commentData
  */
 function handleAddComment(PDO $pdo, $postId, array $commentData)
 {
-    $errors = addCommenttoPost(
+    $errors = addCommentToPost(
         $pdo,
         $postId,
         $commentData
@@ -24,16 +25,16 @@ function handleAddComment(PDO $pdo, $postId, array $commentData)
 }
 
 /**
- * Called to handle the delete comment form, redirects afterward
- *
+ * Called to handle the delete comment form, redirects afterwards
+ * 
  * The $deleteResponse array is expected to be in the form:
- *
- *      Array (  [6]  =>  Delete  )
- *
+ * 
+ *    Array ( [6] => Delete )
+ * 
  * which comes directly from input elements of this form:
- *
- *      name="delete-comment[6]"
- *
+ * 
+ *    name="delete-comment[6]"
+ * 
  * @param PDO $pdo
  * @param integer $postId
  * @param array $deleteResponse
@@ -41,23 +42,21 @@ function handleAddComment(PDO $pdo, $postId, array $commentData)
 function handleDeleteComment(PDO $pdo, $postId, array $deleteResponse)
 {
     if (isLoggedIn())
-    {$keys = array_keys($deleteResponse);
+    {
+        $keys = array_keys($deleteResponse);
         $deleteCommentId = $keys[0];
         if ($deleteCommentId)
         {
-            deletecomment($pdo, $postId, $deleteCommentId);
+            deleteComment($pdo, $postId, $deleteCommentId);
         }
 
         redirectAndExit('view-post.php?post_id=' . $postId);
-
     }
 }
 
-
-
 /**
  * Delete the specified comment on the specified post
- *
+ * 
  * @param PDO $pdo
  * @param integer $postId
  * @param integer $commentId
@@ -74,9 +73,8 @@ function deleteComment(PDO $pdo, $postId, $commentId)
             post_id = :post_id
             AND id = :comment_id
     ";
-
     $stmt = $pdo->prepare($sql);
-    if($stmt === false)
+    if ($stmt === false)
     {
         throw new Exception('There was a problem preparing this query');
     }
@@ -102,7 +100,8 @@ function getPostRow(PDO $pdo, $postId)
 {
     $stmt = $pdo->prepare(
         'SELECT
-            title, created_at, body
+            title, created_at, body,
+            (SELECT COUNT(*) FROM comment WHERE comment.post_id = post.id) comment_count
         FROM
             post
         WHERE

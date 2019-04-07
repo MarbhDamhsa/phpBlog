@@ -18,6 +18,7 @@ else
 // Connect to the database, run a query, handle errors
 $pdo = getPDO();
 $row = getPostRow($pdo, $postId);
+$commentCount = $row['comment_count'];
 
 // If the post does not exist, let's deal with that here
 if (!$row)
@@ -31,30 +32,26 @@ if ($_POST)
     switch ($_GET['action'])
     {
         case 'add-comment':
-	      $commentData = array(
-		      'name' => $_POST['comment-name'],
-		      'website' => $_POST['comment-website'],
-		      'text' => $_POST['comment-text'],
-	       );
-
-    	   $errors = handleAddComment($pdo, $postId, $commentData);
+            $commentData = array(
+                'name' => $_POST['comment-name'],
+                'website' => $_POST['comment-website'],
+                'text' => $_POST['comment-text'],
+            );
+            $errors = handleAddComment($pdo, $postId, $commentData);
             break;
-        case 'delete-comment';
-            // Don't do anything if the user is not authorized
+        case 'delete-comment':
             $deleteResponse = $_POST['delete-comment'];
             handleDeleteComment($pdo, $postId, $deleteResponse);
-            
             break;
-        }
     }
-
+}
 else
 {
-	$commentData = array(
-		'name' => '',
-		'website' => '',
-		'text' => '',
-	);
+    $commentData = array(
+        'name' => '',
+        'website' => '',
+        'text' => '',
+    );
 }
 
 ?>
@@ -68,8 +65,8 @@ else
         <?php require 'templates/head.php' ?>
     </head>
     <body>
-
         <?php require 'templates/title.php' ?>
+
         <div class="post">
             <h2>
                 <?php echo htmlEscape($row['title']) ?>
@@ -77,15 +74,14 @@ else
             <div class="date">
                 <?php echo convertSqlDate($row['created_at']) ?>
             </div>
+
             <?php // This is already escaped, so doesn't need further escaping ?>
-            <?php echo convertNewLinesToParagraphs($row['body']) ?>
+            <?php echo convertNewlinesToParagraphs($row['body']) ?>
         </div>
 
         <?php require 'templates/list-comments.php' ?>
 
-        <?php //We use $commentData in this HTML fragment ?>
-
-
+        <?php // We use $commentData in this HTML fragment ?>
         <?php require 'templates/comment-form.php' ?>
     </body>
 </html>
